@@ -1,0 +1,45 @@
+import requests
+from bs4 import BeautifulSoup
+import csv
+
+
+# URL of the Flipkart TV category page
+url = 'https://www.flipkart.com/search?q=tshirt&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off'
+
+# Send a GET request to the URL
+response = requests.get(url)
+
+
+# Parse the HTML content using BeautifulSoup
+soup = BeautifulSoup(response.content, 'html.parser')
+
+
+# Find all the TV product containers
+shirt_container = soup.find_all('div', {'class': '_1xHGtK _373qXS'})
+
+
+# Create a CSV file to store the product details
+csv_filename = 'shirt_details.csv'
+
+# Open the CSV file in write mode
+with open(csv_filename, 'w', newline='', encoding='utf-8') as csv_file:
+    # Create a CSV writer
+    csv_writer = csv.writer(csv_file)
+
+    # Write the header row
+    csv_writer.writerow(['Product Name', 'Price', 'Actual_Price'])
+
+    # Loop through each TV container and extract product details
+    for sh in shirt_container:
+        try:
+            product_name = sh.find('div', {'class': '_2WkVRV'}).text
+            price = sh.find('div', {'class': '_30jeq3'}).text
+            actual_price = sh.find('div', {'class': '_3I9_wc'}).text
+
+
+            # Write the product details to the CSV file
+            csv_writer.writerow([product_name, price, actual_price])
+        except AttributeError:
+            continue
+
+print("Scraping and CSV export completed successfully.")
